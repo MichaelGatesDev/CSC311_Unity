@@ -2,6 +2,12 @@
 
 This is the repository for my final project in CSC311 (Unity) at SUNY Plattsburgh.
 
+## Screenshots
+
+![](https://i.imgur.com/aGM11oY.png)
+![](https://i.imgur.com/ObnWvup.png)
+![](https://i.imgur.com/iChLbg0.png)
+
 ## How to play
 
 The objetive of the game is to collect all of the pickups around the level without losing all of your lives.
