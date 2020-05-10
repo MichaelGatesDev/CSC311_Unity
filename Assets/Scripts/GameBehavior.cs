@@ -31,6 +31,7 @@ public class GameBehavior : MonoBehaviour
         CON_WinScreen.SetActive(false);
         CON_LoseScreen.SetActive(false);
         statusText.SetText("");
+        levelIndicatorText.SetText("Level " + int.Parse(SceneManager.GetActiveScene().name.Replace("Level", "")));
     }
 
     private void Start()
@@ -45,9 +46,6 @@ public class GameBehavior : MonoBehaviour
         bgMusicAudio.Play();
 
         LevelChangeTrigger.SetActive(false);
-        UpdateHealthText();
-        UpdateItemsText();
-        levelIndicatorText.SetText("Level " + int.Parse(SceneManager.GetActiveScene().name.Replace("Level", "")));
     }
 
     private void Update()
@@ -63,41 +61,52 @@ public class GameBehavior : MonoBehaviour
         }
     }
 
-    public void UpdateHealthText()
+    public void UpdateHealthText(int current, int max)
     {
-        healthText.SetText($"Player Health: {PlayerBehavior.lives}/{PlayerBehavior.maxLives}");
+        healthText.SetText($"Player Health: {current}/{max}");
     }
 
-    public void UpdateItemsText()
+    public void UpdateItemsText(int current, int max)
     {
-        itemsCollectedText.SetText($"Items Collected: {PlayerBehavior.items}/{PlayerBehavior.maxItems}");
+        itemsCollectedText.SetText($"Items Collected: {current}/{max}");
     }
 
-    public void OnItemCollected()
+    public void OnItemCollected(int current, int max)
     {
-        var remainingItems = PlayerBehavior.maxItems - PlayerBehavior.items;
+        var remainingItems = max - current;
 
-        UpdateItemsText();
+        UpdateItemsText(current, max);
         if (statusTextRoutine != null)
             StopCoroutine(statusTextRoutine);
 
-        if (remainingItems > 0)
+        if (current >= max)
         {
-            statusTextRoutine = StartCoroutine(TemporaryText(statusText, 3.0f, $"You collected another item! Only {remainingItems} remaining!"));
+            OnLevelComplete();
         }
         else
         {
-            statusTextRoutine = StartCoroutine(TemporaryText(statusText, 3.0f, $"You collected all the items! Continue to the next level!"));
+            if (remainingItems > 0)
+            {
+                statusTextRoutine = StartCoroutine(TemporaryText(statusText, 3.0f, $"You collected another item! Only {remainingItems} remaining!"));
+            }
+            else
+            {
+                statusTextRoutine = StartCoroutine(TemporaryText(statusText, 3.0f, $"You collected all the items! Continue to the next level!"));
+            }
         }
     }
 
-    public void OnLifeLost()
+    public void OnLifeLost(int current, int max)
     {
-        UpdateHealthText();
+        UpdateHealthText(current, max);
         if (statusTextRoutine != null)
             StopCoroutine(statusTextRoutine);
 
-        if (PlayerBehavior.lives > 0)
+        if (current <= 0)
+        {
+            OnGameLose();
+        }
+        else
         {
             statusTextRoutine = StartCoroutine(TemporaryText(statusText, 3.0f, $"You lost a life! Only {PlayerBehavior.lives} remaining!"));
         }
@@ -126,8 +135,9 @@ public class GameBehavior : MonoBehaviour
         Time.timeScale = 0;
     }
 
-    public void RestartLevel()
+    public void RestartGame()
     {
+        PlayerPrefs.DeleteAll();
         SceneManager.LoadScene(0);
         Time.timeScale = 1.0f;
     }

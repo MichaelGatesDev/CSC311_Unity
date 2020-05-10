@@ -37,23 +37,22 @@ public class PlayerBehavior : MonoBehaviour
 
     public bool inDanger;
     public bool isInvincible;
+    private static readonly int Active = Animator.StringToHash("active");
 
     void Awake()
     {
         lives = maxLives;
         items = 0;
-
-        // restore prefs if level 2 is loaded
-        if (SceneManager.GetActiveScene().buildIndex == 1)
+        
+        if (PlayerPrefs.HasKey("player_lives")) lives = PlayerPrefs.GetInt("player_lives");
+        if (PlayerPrefs.HasKey("player_score"))
         {
-            Debug.Log("Restoring prefs");
-            lives = PlayerPrefs.GetInt("player_lives");
             items = PlayerPrefs.GetInt("player_score");
             maxItems += items;
-
-            gameBehavior.UpdateHealthText();
-            gameBehavior.UpdateItemsText();
         }
+        
+        gameBehavior.UpdateHealthText(lives, maxLives);
+        gameBehavior.UpdateItemsText(items, maxItems);
     }
 
     void Start()
@@ -131,29 +130,25 @@ public class PlayerBehavior : MonoBehaviour
         }
     }
 
+    public void OnItemCollected()
+    {
+        items++;
+        PlayerPrefs.SetInt("player_score", items);
+        gameBehavior.OnItemCollected(items, maxItems);
+    }
+    
     public void OnLifeLost()
     {
         lives--;
         PlayerPrefs.SetInt("player_lives", lives);
         isInvincible = true;
-        invincibilityIndicatorAnimator.SetBool("active", true);
+        invincibilityIndicatorAnimator.SetBool(Active, true);
         StartCoroutine(nameof(ResetInvincible));
-        gameBehavior.OnLifeLost();
+        gameBehavior.OnLifeLost(lives, maxLives);
         if (lives <= 0)
         {
             _audioHelper.PlaySound(PlayerDeathSound, 1.0f, 1.0f);
-            gameBehavior.OnGameLose();
         }
     }
 
-    public void OnItemCollected()
-    {
-        items++;
-        PlayerPrefs.SetInt("player_score", items);
-        gameBehavior.OnItemCollected();
-        if (items >= maxItems)
-        {
-            gameBehavior.OnLevelComplete();
-        }
-    }
 }
