@@ -119,7 +119,7 @@ public class GameBehavior : MonoBehaviour
         textObj.SetText("");
     }
 
-    public void OnGameWin()
+    private void OnGameWin()
     {
         healthText.gameObject.SetActive(false);
         itemsCollectedText.gameObject.SetActive(false);
@@ -127,7 +127,7 @@ public class GameBehavior : MonoBehaviour
         Time.timeScale = 0;
     }
 
-    public void OnGameLose()
+    private void OnGameLose()
     {
         healthText.gameObject.SetActive(false);
         itemsCollectedText.gameObject.SetActive(false);
@@ -140,6 +140,11 @@ public class GameBehavior : MonoBehaviour
         PlayerPrefs.DeleteAll();
         SceneManager.LoadScene(0);
         Time.timeScale = 1.0f;
+    }
+
+    private void OnApplicationQuit()
+    {
+        PlayerPrefs.DeleteAll();
     }
 
     public void LoadNextLevel()
