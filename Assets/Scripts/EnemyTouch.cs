@@ -14,14 +14,15 @@ public class EnemyTouch : MonoBehaviour
             Debug.Log("Player touched me!");
             // trigger player in danger
             var pb = other.GetComponent<PlayerBehavior>();
-            pb.inDanger = false;
-            pb.OnLifeLost();
+            if (!pb.isInvincible)
+            {
+                pb.OnLifeLost();
+            }
 
+            pb.inDanger = false;
             // resume patrol
             EnemyBehavior.MoveToNextPatrolLocation();
             EnemyBehavior.Target = null;
-
-            //TODO raycast for line of sight
         }
         // touched projectile
         else if (hitTag == "Projectile")
