@@ -41,6 +41,7 @@ public class GameBehavior : MonoBehaviour
         var bgMusicAudio = bgMusicObj.gameObject.AddComponent<AudioSource>();
         bgMusicAudio.clip = BackgroundMusic;
         bgMusicAudio.volume = 0.25f;
+        bgMusicAudio.loop = true;
         bgMusicAudio.Play();
 
         LevelChangeTrigger.SetActive(false);
