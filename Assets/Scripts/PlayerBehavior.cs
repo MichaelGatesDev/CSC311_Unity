@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerBehavior : MonoBehaviour
 {
@@ -37,11 +38,26 @@ public class PlayerBehavior : MonoBehaviour
     public bool inDanger;
     public bool isInvincible;
 
-    void Start()
+    void Awake()
     {
         lives = maxLives;
         items = 0;
 
+        // restore prefs if level 2 is loaded
+        if (SceneManager.GetActiveScene().buildIndex == 1)
+        {
+            Debug.Log("Restoring prefs");
+            lives = PlayerPrefs.GetInt("player_lives");
+            items = PlayerPrefs.GetInt("player_score");
+            maxItems += items;
+
+            gameBehavior.UpdateHealthText();
+            gameBehavior.UpdateItemsText();
+        }
+    }
+
+    void Start()
+    {
         _audioHelper = GameObject.Find("Audio Manager").GetComponent<AudioHelper>();
     }
 
@@ -118,6 +134,7 @@ public class PlayerBehavior : MonoBehaviour
     public void OnLifeLost()
     {
         lives--;
+        PlayerPrefs.SetInt("player_lives", lives);
         isInvincible = true;
         invincibilityIndicatorAnimator.SetBool("active", true);
         StartCoroutine(nameof(ResetInvincible));
@@ -132,6 +149,7 @@ public class PlayerBehavior : MonoBehaviour
     public void OnItemCollected()
     {
         items++;
+        PlayerPrefs.SetInt("player_score", items);
         gameBehavior.OnItemCollected();
         if (items >= maxItems)
         {

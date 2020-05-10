@@ -63,12 +63,12 @@ public class GameBehavior : MonoBehaviour
         }
     }
 
-    private void UpdateHealthText()
+    public void UpdateHealthText()
     {
         healthText.SetText($"Player Health: {PlayerBehavior.lives}/{PlayerBehavior.maxLives}");
     }
 
-    private void UpdateItemsText()
+    public void UpdateItemsText()
     {
         itemsCollectedText.SetText($"Items Collected: {PlayerBehavior.items}/{PlayerBehavior.maxItems}");
     }
